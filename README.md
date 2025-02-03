@@ -1,6 +1,6 @@
 # API Testing Project
 
-This project includes test automation for an Employee Benefits API using multiple testing tools.
+This project includes test automation for a paylocity demo Qa challenge using multiple testing tools.
 
 ## Project Structure
 
