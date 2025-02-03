@@ -1,0 +1,957 @@
+{
+	"info": {
+		"_postman_id": "1ad2a564-9e1d-4bc9-bd30-6d0765087d83",
+		"name": "Empoloyee API tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41661657"
+	},
+	"item": [
+		{
+			"name": "Get Employee List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1. Verificar que la petición fue exitosa",
+							"pm.test(\"La petición se realizó exitosamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 2. Verificar que la respuesta es JSON",
+							"pm.test(\"La respuesta es JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// 3. Verificar que la respuesta es un array",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"La respuesta es un array de empleados\", function () {",
+							"    pm.expect(jsonData).to.be.an('array').and.to.not.be.empty;",
+							"});",
+							"",
+							"// 4. Tomar el primer empleado para validaciones detalladas",
+							"const primerEmpleado = jsonData[0];",
+							"",
+							"// 5. Verificar estructura y existencia de campos para el primer empleado",
+							"pm.test(\"El empleado tiene todos los campos requeridos\", function () {",
+							"    const camposRequeridos = [",
+							"        'partitionKey',",
+							"        'sortKey',",
+							"        'username',",
+							"        'id',",
+							"        'firstName',",
+							"        'lastName',",
+							"        'dependants',",
+							"        'expiration',",
+							"        'salary',",
+							"        'gross',",
+							"        'benefitsCost',",
+							"        'net'",
+							"    ];",
+							"",
+							"    camposRequeridos.forEach(campo => {",
+							"        pm.expect(primerEmpleado, `Campo faltante: ${campo}`).to.have.property(campo);",
+							"        pm.expect(primerEmpleado[campo], `Campo ${campo} es null o undefined`).to.exist;",
+							"    });",
+							"});",
+							"",
+							"// 6. Verificar tipos de datos del primer empleado",
+							"pm.test(\"Los campos tienen el tipo de dato correcto\", function () {",
+							"    // Validar strings",
+							"    pm.expect(primerEmpleado.partitionKey).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.sortKey).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.username).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.id).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.firstName).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.lastName).to.be.a('string').and.not.empty;",
+							"    pm.expect(primerEmpleado.expiration).to.be.a('string').and.not.empty;",
+							"",
+							"});",
+							"",
+							"// 7. Verificar cálculos del primer empleado",
+							"pm.test(\"Los cálculos son correctos para el empleado\", function() {",
+							"    // Verificar cálculo de beneficios",
+							"    const expectedBenefitsCost = (1000 + (500 * primerEmpleado.dependants)) / 26;",
+							"    pm.expect(parseFloat(primerEmpleado.benefitsCost)).to.be.closeTo(expectedBenefitsCost, 0.01);",
+							"    ",
+							"    // Verificar cálculo de net",
+							"    const expectedNet = primerEmpleado.gross - primerEmpleado.benefitsCost;",
+							"    pm.expect(parseFloat(primerEmpleado.net)).to.be.closeTo(expectedNet, 0.01);",
+							"});",
+							"",
+							"// 8. Verificar header de autorizacion",
+							"pm.test(\"La petición incluye autorización\", function () {",
+							"    pm.request.to.have.header(\"Authorization\");",
+							"    pm.expect(pm.request.headers.get(\"Authorization\")).to.include(\"Basic\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+					"protocol": "https",
+					"host": [
+						"wmxrwq14uc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Prod",
+						"api",
+						"employees"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Employee List",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+							"protocol": "https",
+							"host": [
+								"wmxrwq14uc",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"Prod",
+								"api",
+								"employees"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "626"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2020 19:06:53 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "e1b146c6-7a04-4a7b-96bd-380bb13d9a4e"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "HVZUKE7XoAMF9zA="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-5e386f4d-cac36a4413295f7df774bd58;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 7b891ba5ffaf08dd209adf67026190db.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "ORD52-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "hSm_Jsqc_yaXsj2yELKp03K5oDWhSfeYrwgUh_hmlh0v1onUHQaqEQ=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"partitionKey\": \"TestUser1\",\n        \"sortKey\": \"15ab4884-e96c-4b4f-842c-6dd389033766\",\n        \"username\": \"TestUser1\",\n        \"id\": \"15ab4884-e96c-4b4f-842c-6dd389033766\",\n        \"firstName\": \"Steve\",\n        \"lastName\": \"Rogers\",\n        \"dependants\": 1,\n        \"expiration\": \"2020-02-23T17:41:07+00:00\",\n        \"salary\": 52000,\n        \"gross\": 2000,\n        \"benefitsCost\": 57.69231,\n        \"net\": 1942.30774\n    },\n    {\n        \"partitionKey\": \"TestUser1\",\n        \"sortKey\": \"ee4e35f4-bbe8-4905-afaa-48403c19c42e\",\n        \"username\": \"TestUser1\",\n        \"id\": \"ee4e35f4-bbe8-4905-afaa-48403c19c42e\",\n        \"firstName\": \"Tony\",\n        \"lastName\": \"Stark\",\n        \"dependants\": 2,\n        \"expiration\": \"2020-03-03T19:06:35+00:00\",\n        \"salary\": 52000,\n        \"gross\": 2000,\n        \"benefitsCost\": 76.92308,\n        \"net\": 1923.0769\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Add Employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1. Verificar que la petición fue exitosa",
+							"pm.test(\"La petición se realizó exitosamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 2. Verificar que la respuesta es JSON",
+							"pm.test(\"La respuesta es JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// 3. Verificar que los datos enviados se guardaron correctamente",
+							"const jsonData = pm.response.json();",
+							"const requestData = JSON.parse(pm.request.body.raw);",
+							"",
+							"pm.test(\"Los datos se guardaron correctamente\", function () {",
+							"    // Verificar que los campos enviados coinciden",
+							"    pm.expect(jsonData.firstName).to.equal(requestData.firstName);",
+							"    pm.expect(jsonData.lastName).to.equal(requestData.lastName);",
+							"    pm.expect(jsonData.dependants).to.equal(requestData.dependants);",
+							"});",
+							"",
+							"// 4. Verificar estructura del response",
+							"pm.test(\"La respuesta tiene la estructura correcta\", function () {",
+							"    // Campos que deben existir",
+							"    pm.expect(jsonData.partitionKey).to.exist;",
+							"    pm.expect(jsonData.sortKey).to.exist;",
+							"    pm.expect(jsonData.username).to.exist;",
+							"    pm.expect(jsonData.id).to.exist;",
+							"    pm.expect(jsonData.salary).to.exist;",
+							"    pm.expect(jsonData.gross).to.exist;",
+							"    pm.expect(jsonData.benefitsCost).to.exist;",
+							"    pm.expect(jsonData.net).to.exist;",
+							"});",
+							"",
+							"// 5. Verificar tipos de datos en la respuesta",
+							"pm.test(\"Los campos tienen el tipo de dato correcto\", function () {",
+							"    // Validar strings",
+							"    pm.expect(jsonData.firstName).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.lastName).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.id).to.be.a('string').and.not.empty;",
+							"    ",
+							"    // Validar números",
+							"    pm.expect(jsonData.dependants).to.be.a('number');",
+							"    pm.expect(jsonData.salary).to.be.a('number');",
+							"    pm.expect(jsonData.benefitsCost).to.be.a('number');",
+							"    pm.expect(jsonData.net).to.be.a('number');",
+							"});",
+							"",
+							"// 6. Verificar los cálculos",
+							"pm.test(\"Los cálculos son correctos\", function() {",
+							"    // Verificar cálculo de beneficios",
+							"    const expectedBenefitsCost = (1000 + (500 * jsonData.dependants)) / 26;",
+							"    pm.expect(parseFloat(jsonData.benefitsCost)).to.be.closeTo(expectedBenefitsCost, 0.01);",
+							"    ",
+							"    // Verificar cálculo de net",
+							"    const expectedNet = jsonData.gross - jsonData.benefitsCost;",
+							"    pm.expect(parseFloat(jsonData.net)).to.be.closeTo(expectedNet, 0.01);",
+							"});",
+							"",
+							"// 7. Verificar headers requeridos",
+							"pm.test(\"Los headers requeridos están presentes\", function () {",
+							"    pm.request.to.have.header(\"Authorization\");",
+							"    pm.request.to.have.header(\"Content-Type\");",
+							"    pm.expect(pm.request.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Natasha\",\n    \"lastName\": \"Romanoff\",\n    \"dependants\": 3\n}"
+				},
+				"url": {
+					"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+					"protocol": "https",
+					"host": [
+						"wmxrwq14uc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Prod",
+						"api",
+						"employees"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Add Employee",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"name": "Content-Type",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Natasha\",\n    \"lastName\": \"Romanoff\",\n    \"dependants\": 3\n}"
+						},
+						"url": {
+							"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+							"protocol": "https",
+							"host": [
+								"wmxrwq14uc",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"Prod",
+								"api",
+								"employees"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "278"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2020 19:09:21 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "3396c97b-999d-4f05-9a05-e703570f753e"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "HVZrMGHHoAMFygA="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-5e386fe1-6e06a18a49d85a67160a88a7;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 7b891ba5ffaf08dd209adf67026190db.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "ORD52-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "nFIi5rL0BsEjX8yNyOIIgOTSBrAoosGndMNagg_yN3RMBGx-TQYmVA=="
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"partitionKey\": \"TestUser1\",\n    \"sortKey\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"username\": \"TestUser1\",\n    \"id\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"firstName\": \"Natasha\",\n    \"lastName\": \"Romanoff\",\n    \"dependants\": 3,\n    \"salary\": 52000,\n    \"gross\": 2000,\n    \"benefitsCost\": 96.1538544,\n    \"net\": 1903.84619\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1. Verificar que la petición fue exitosa",
+							"pm.test(\"La petición se realizó exitosamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 2. Verificar que la respuesta es JSON",
+							"pm.test(\"La respuesta es JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// 3. Verificar estructura completa del response",
+							"const jsonData = pm.response.json();",
+							"pm.test(\"La respuesta tiene la estructura correcta\", function () {",
+							"    // Lista de campos requeridos",
+							"    const requiredFields = [",
+							"        'partitionKey',",
+							"        'sortKey',",
+							"        'username',",
+							"        'id',",
+							"        'firstName',",
+							"        'lastName',",
+							"        'dependants',",
+							"        'expiration',",
+							"        'salary',",
+							"        'gross',",
+							"        'benefitsCost',",
+							"        'net'",
+							"    ];",
+							"",
+							"    // Verificar que existen todos los campos requeridos",
+							"    requiredFields.forEach(field => {",
+							"        pm.expect(jsonData, `El campo ${field} debe existir`).to.have.property(field);",
+							"    });",
+							"});",
+							"",
+							"// 4. Verificar tipos de datos en el response",
+							"pm.test(\"Los campos tienen el tipo de dato correcto\", function () {",
+							"    // Validar strings",
+							"    pm.expect(jsonData.partitionKey).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.sortKey).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.username).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.id).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.firstName).to.be.a('string').and.not.empty;",
+							"    pm.expect(jsonData.lastName).to.be.a('string').and.not.empty;",
+							"    ",
+							"    // Validar números",
+							"    pm.expect(jsonData.dependants).to.be.a('number');",
+							"    pm.expect(jsonData.salary).to.be.a('number');",
+							"    pm.expect(jsonData.gross).to.be.a('number');",
+							"    pm.expect(jsonData.benefitsCost).to.be.a('number');",
+							"    pm.expect(jsonData.net).to.be.a('number');",
+							"});",
+							"",
+							"// 5. Verificar los cálculos de beneficios",
+							"pm.test(\"Los cálculos de beneficios son correctos\", function() {",
+							"    // Validar el cálculo de beneficios",
+							"    const expectedBenefitsCost = (1000 + (500 * jsonData.dependants)) / 26;",
+							"    pm.expect(parseFloat(jsonData.benefitsCost)).to.be.closeTo(expectedBenefitsCost, 0.01);",
+							"    ",
+							"    // Validar el cálculo de net",
+							"    const expectedNet = jsonData.gross - jsonData.benefitsCost;",
+							"    pm.expect(parseFloat(jsonData.net)).to.be.closeTo(expectedNet, 0.01);",
+							"});",
+							"",
+							"// 6. Verificar que el header de autorización está presente",
+							"pm.test(\"La petición incluye autorización\", function () {",
+							"    pm.request.to.have.header(\"Authorization\");",
+							"    pm.expect(pm.request.headers.get(\"Authorization\")).to.include(\"Basic\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token}}"
+					}
+				],
+				"url": {
+					"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees/{{id}}",
+					"protocol": "https",
+					"host": [
+						"wmxrwq14uc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Prod",
+						"api",
+						"employees",
+						"{{id}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Employee",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees/{{id}}",
+							"protocol": "https",
+							"host": [
+								"wmxrwq14uc",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"Prod",
+								"api",
+								"employees",
+								"{{id}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "319"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2020 19:10:22 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "bf18fb76-80d3-4528-a665-5043bf59f85f"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "HVZ0tHDPoAMFXnA="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-5e38701e-9141e79093a7e70db2994c31;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 7b891ba5ffaf08dd209adf67026190db.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "ORD52-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "lrYWY_SO_d8jw6OeCucWpEiCGR4Mwb9BCRHlXXw-9fcWfxq4nvk39Q=="
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"partitionKey\": \"TestUser1\",\n    \"sortKey\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"username\": \"TestUser1\",\n    \"id\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"firstName\": \"Natasha\",\n    \"lastName\": \"Romanoff\",\n    \"dependants\": 3,\n    \"expiration\": \"2020-03-03T19:09:21+00:00\",\n    \"salary\": 52000,\n    \"gross\": 2000,\n    \"benefitsCost\": 96.1538544,\n    \"net\": 1903.84619\n}"
+				}
+			]
+		},
+		{
+			"name": "Update Employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1. Verificar que la petición fue exitosa",
+							"pm.test(\"La petición se realizó exitosamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 2. Verificar que la respuesta es JSON",
+							"pm.test(\"La respuesta es JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// 3. Verificar que los datos enviados se actualizaron correctamente",
+							"const jsonData = pm.response.json();",
+							"const requestData = JSON.parse(pm.request.body.raw);",
+							"",
+							"pm.test(\"Los datos se actualizaron correctamente\", function () {",
+							"    // Verificar que los campos actualizados coinciden",
+							"    pm.expect(jsonData.firstName).to.equal(requestData.firstName);",
+							"    pm.expect(jsonData.lastName).to.equal(requestData.lastName);",
+							"    pm.expect(jsonData.dependants).to.equal(requestData.dependants);",
+							"    pm.expect(jsonData.id).to.equal(requestData.id);",
+							"});",
+							"",
+							"// 4. Verificar que los datos calculados se actualizaron",
+							"pm.test(\"Los datos calculados se actualizaron\", function () {",
+							"    // Verificar que existe el cálculo de beneficios",
+							"    pm.expect(jsonData.benefitsCost).to.exist;",
+							"    pm.expect(jsonData.net).to.exist;",
+							"    pm.expect(jsonData.gross).to.exist;",
+							"    ",
+							"    // Verificar el cálculo de beneficios",
+							"    const expectedBenefitsCost = (1000 + (500 * jsonData.dependants)) / 26;",
+							"    pm.expect(parseFloat(jsonData.benefitsCost)).to.be.closeTo(expectedBenefitsCost, 0.01);",
+							"    ",
+							"    // Verificar el cálculo de net",
+							"    const expectedNet = jsonData.gross - jsonData.benefitsCost;",
+							"    pm.expect(parseFloat(jsonData.net)).to.be.closeTo(expectedNet, 0.01);",
+							"});",
+							"",
+							"// 5. Verificar que los datos no actualizables permanecen igual",
+							"pm.test(\"Los datos no actualizables permanecen igual\", function () {",
+							"    pm.expect(jsonData.salary).to.exist;",
+							"    pm.expect(jsonData.username).to.exist;",
+							"    pm.expect(jsonData.partitionKey).to.exist;",
+							"    pm.expect(jsonData.sortKey).to.equal(jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"fdc0df55-4a90-4a46-8c11-edc3193806f2\",\r\n    \"firstName\": \"Wanda\",\r\n    \"lastName\": \"Maximoff\",\r\n    \"dependants\": 2\r\n}"
+				},
+				"url": {
+					"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+					"protocol": "https",
+					"host": [
+						"wmxrwq14uc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Prod",
+						"api",
+						"employees"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update Employee",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\r\n    \"firstName\": \"Wanda\",\r\n    \"lastName\": \"Maximoff\",\r\n    \"dependants\": 2\r\n}"
+						},
+						"url": {
+							"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees",
+							"protocol": "https",
+							"host": [
+								"wmxrwq14uc",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"Prod",
+								"api",
+								"employees"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "273"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2020 19:12:29 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "b3f07a0a-aba4-48e4-9855-2b6fc99920e3"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "HVaIhGR9IAMFZgw="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-5e38709c-30cd94066950169ffcb7b740;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 7b891ba5ffaf08dd209adf67026190db.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "ORD52-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "aFTv25JDJ9ReKZpm8rSalwgyZ3wvDFHd39pTnfc_isJNtJ9H4qXnXw=="
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"partitionKey\": \"TestUser1\",\n    \"sortKey\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"username\": \"TestUser1\",\n    \"id\": \"1945d706-39f3-49eb-bea8-98abcf766e5e\",\n    \"firstName\": \"Wanda\",\n    \"lastName\": \"Maximoff\",\n    \"dependants\": 2,\n    \"salary\": 52000,\n    \"gross\": 2000,\n    \"benefitsCost\": 76.92308,\n    \"net\": 1923.0769\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete Employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1. Verificar que la petición fue exitosa",
+							"pm.test(\"La eliminación se realizó exitosamente\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 3. Verificar que la respuesta está vacía",
+							"pm.test(\"La respuesta no contiene contenido\", function () {",
+							"    pm.response.to.not.have.jsonBody();",
+							"    pm.expect(pm.response.text()).to.be.empty;",
+							"});",
+							"",
+							"// 4. Verificar que el header de autorización está presente",
+							"pm.test(\"La petición incluye autorización\", function () {",
+							"    pm.request.to.have.header(\"Authorization\");",
+							"    pm.expect(pm.request.headers.get(\"Authorization\")).to.include(\"Basic\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees/{{id}}",
+					"protocol": "https",
+					"host": [
+						"wmxrwq14uc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Prod",
+						"api",
+						"employees",
+						"{{id}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete Employee",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/employees/{{id}}",
+							"protocol": "https",
+							"host": [
+								"wmxrwq14uc",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"Prod",
+								"api",
+								"employees",
+								"{{id}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Content-Length",
+							"value": "0"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2020 19:13:30 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "9bc8a4a9-6860-4fea-8d16-e49c291b1d86"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "HVaSIHvFIAMFkCg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-5e3870da-ab5c33d01cc1ff705e9da8a0;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 7b891ba5ffaf08dd209adf67026190db.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "ORD52-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "pr-VjFpfZKGE1FX_OZ9wEbNuPjPBwCOk1AZqg4X54cI-b_Q2MtGVVA=="
+						}
+					],
+					"cookie": [],
+					"body": "    "
+				}
+			]
+		}
+	]
+}
