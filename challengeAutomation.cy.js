@@ -84,6 +84,18 @@ it("Add a user with string dependant", () => {
  })
 })
 
+it("Add a user with -1 dependant", () => {
+  cy.get("[id='add']").should("exist").click()
+  cy.get("[id='firstName']").type("Victor")
+  cy.get("[id='lastName']").type("Cortes")
+  cy.get("[id='dependants']").type("-1")
+  cy.intercept('POST', '**/api/employees').as('employeesRequest')
+  cy.get("[id='addEmployee']").click()  
+  cy.wait('@employeesRequest').then((interception) => {
+   expect(interception.response.statusCode).to.equal(400)
+ })
+})
+
 it("Add a user with 33 or more dependants", () => {  
   cy.get("[id='add']").should("exist").click()
   cy.get("[id='firstName']").type("Victor")
@@ -101,6 +113,18 @@ it("Add a user with 15.something or more dependants", () => {
   cy.get("[id='firstName']").type("Victor")
   cy.get("[id='lastName']").type("Cortes")
   cy.get("[id='dependants']").type("15.25")
+  cy.intercept('POST', '**/api/employees').as('employeesRequest')
+  cy.get("[id='addEmployee']").click()  
+  cy.wait('@employeesRequest').then((interception) => {
+   expect(interception.response.statusCode).to.equal(400)
+})
+})
+
+it("Add a user with special characters in name and last name", () => { 
+  cy.get("[id='add']").should("exist").click()
+  cy.get("[id='firstName']").type("Victor$")
+  cy.get("[id='lastName']").type("Cortes$")
+  cy.get("[id='dependants']").type("15")
   cy.intercept('POST', '**/api/employees').as('employeesRequest')
   cy.get("[id='addEmployee']").click()  
   cy.wait('@employeesRequest').then((interception) => {
@@ -176,7 +200,7 @@ it("Error is shown when the the last name is more than 50 characters", () => {
 
 
 context("Edit User", () => {
-  it("User is able to edit 1 employe with new 0 dependants", () => {
+  it.only("User is able to edit 1 employe with new 0 dependants", () => {
     cy.get(':nth-child(1) > :nth-child(9) > .fa-edit').click()
     cy.intercept('PUT', '**/api/employees').as('createEmployee')
     cy.get("[id='firstName']").clear().type("Victor")
@@ -184,10 +208,16 @@ context("Edit User", () => {
     cy.get("[id='dependants']").clear().type("0")
     cy.get("[id='updateEmployee']").click()
   
-  cy.wait('@createEmployee').then((interception) => {
+   cy.wait('@createEmployee').then((interception) => {
     expect(interception.response.statusCode).to.equal(200)
     const response = interception.response.body
     const dependants = response.dependants
+    const requestBody = interception.request.body;
+    const responseBody = interception.response.body;
+            
+    expect(responseBody.id).to.equal(requestBody.id);
+    expect(responseBody.sortKey).to.equal(requestBody.id)
+
     expect(response.salary).to.equal(52000)
     expect(response.gross).to.equal(2000)
     const annualBenefitsCost = 1000 + (500 * dependants)
@@ -254,8 +284,6 @@ context("Edit User", () => {
 
     expect(interception.response.statusCode).to.equal(400)
     expect(interception.response.body[0].errorMessage).to.equal('The FirstName field is required.')
-   
-  
   })
   })
 
